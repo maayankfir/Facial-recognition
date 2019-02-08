@@ -36,7 +36,28 @@ const particlesOptions = {
 class App extends Component {
   state = {
     input: '',
-    imgUrl: ''
+    imgUrl: '',
+    box: {}
+  }
+
+  findFaceLocation = (data) => {
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box
+    const image = document.getElementById('inputimage')
+    const width = Number(image.width)
+    const height = Number(image.height)
+    // console.log(width, height);
+    return {
+      left: clarifaiFace.left_col * width,
+      top: clarifaiFace.top_row * height,
+      right: width - (clarifaiFace.right_col * width),
+      bottom: height - (clarifaiFace.bottom_row * height)
+    }
+  }
+
+  displayFaceBox = (box) => {
+    this.setState({
+      box: box
+    })
   }
 
   onInputChange = (event) => {
@@ -51,19 +72,16 @@ class App extends Component {
       imgUrl: this.state.input
     })
     app.models.predict(
-      Clarifai.FACE_DETECT_MODEL,
-      this.state.input)
-     .then(
-      function(response) {
-        console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
-      },
-      function(err) {
-
-      }
+        Clarifai.FACE_DETECT_MODEL,
+        this.state.input)
+     .then(response => this.displayFaceBox(this.findFaceLocation(response))
+     .catch(err => console.log(err))
     )
   }
 
+
   render() {
+    console.log(this.state.box);
     return (
       <div className="App">
       <Particles className="particles" params={particlesOptions} />
@@ -73,7 +91,7 @@ class App extends Component {
 
         <ImageLinkForm onInputChange={this.onInputChange}
          onSubmit={this.onSubmit}/>
-        <FaceReconition imgUrl={this.state.imgUrl}/>
+        <FaceReconition box={this.state.box} imgUrl={this.state.imgUrl}/>
       </div>
     )
   }
