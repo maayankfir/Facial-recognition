@@ -41,7 +41,26 @@ class App extends Component {
     imgUrl: '',
     box: {},
     route: 'signin',
-    isSignIn: false
+    isSignIn: false,
+    user: {
+      id: '',
+      name: '',
+      email: '',
+      entries: 0,
+      joined: ''
+    }
+  }
+
+  loadUser = (data) => {
+    this.setState({
+      user: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined
+      }
+    })
   }
 
   findFaceLocation = (data) => {
@@ -101,7 +120,7 @@ class App extends Component {
 
   render() {
     // console.log(this.state.box);
-    console.log(this.state.isSignIn);
+    // console.log(this.state.isSignIn);
     return (
       <div className="App">
         <Particles className="particles" params={particlesOptions} />
@@ -117,7 +136,7 @@ class App extends Component {
         : (
           this.state.route === "signin" ?
            ( <SignIn onRouteChange={this.onRouteChange}/>)
-            : ( <SignUp onRouteChange={this.onRouteChange}/> )
+            : ( <SignUp loadUser={this.loadUser} onRouteChange={this.onRouteChange}/> )
           )}
       </div>
     )
